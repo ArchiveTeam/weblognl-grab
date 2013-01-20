@@ -1,5 +1,3 @@
-dofile("table_show.lua")
-
 local url_count = 0
 
 wget.callbacks.get_urls = function(file, url, is_css, iri)
