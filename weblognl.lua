@@ -42,6 +42,12 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     os.execute("sleep "..delay)
     gateway_error_delay = math.min(5, gateway_error_delay + 1)
     return wget.actions.CONTINUE
+
+  elseif http_stat.statcode == 500 and string.match(url["host"], "%.weblog%.nl$") then
+    io.stdout:write("\nServer returned error 500. Trying this item later.\n")
+    io.stdout:flush()
+    return wget.actions.ABORT
+
   else
     if http_stat.statcode == 200 then
       gateway_error_delay = -3
