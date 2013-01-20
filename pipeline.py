@@ -84,7 +84,7 @@ pipeline = Pipeline(
       "--timeout", "60",
       "--tries", "20",
       "--waitretry", "5",
-      "--randomwait", "4",
+      "--random-wait", "4",
       "--warc-file", ItemInterpolation("%(item_dir)s/%(warc_file_base)s"),
       "--warc-header", "operator: Archive Team",
       "--warc-header", "weblognl-dld-script-version: " + VERSION,
