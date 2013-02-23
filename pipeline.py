@@ -11,6 +11,9 @@ from tornado import gen, ioloop
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
 import seesaw
+if StrictVersion(seesaw.__version__) < StrictVersion("0.0.12"):
+  raise Exception("This pipeline needs seesaw version 0.0.12 or higher.")
+
 from seesaw.project import *
 from seesaw.config import *
 from seesaw.item import *
@@ -18,14 +21,26 @@ from seesaw.task import *
 from seesaw.pipeline import *
 from seesaw.externalprocess import *
 from seesaw.tracker import *
+from seesaw.util import find_executable
 
 
-if StrictVersion(seesaw.__version__) < StrictVersion("0.0.10"):
-  raise Exception("This pipeline needs seesaw version 0.0.10 or higher.")
+WGET_LUA = find_executable("Wget+Lua",
+    "GNU Wget 1.14.lua.20130120-8476",
+    [ "./wget-lua",
+      "./wget-lua-warrior",
+      "./wget-lua-local",
+      "../wget-lua",
+      "../../wget-lua",
+      "/home/warrior/wget-lua",
+      "/usr/bin/wget-lua" ])
+
+if not WGET_LUA:
+  raise Exception("No usable Wget+Lua found.")
+
 
 
 USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27"
-VERSION = "20130120.03"
+VERSION = "20130223.01"
 
 class PrepareDirectories(SimpleTask):
   def __init__(self):
@@ -69,7 +84,7 @@ project = Project(
 pipeline = Pipeline(
   GetItemFromTracker("http://tracker.archiveteam.org/weblognl", downloader, VERSION),
   PrepareDirectories(),
-  WgetDownload([ "./wget-lua",
+  WgetDownload([ WGET_LUA,
       "-U", USER_AGENT,
       "-nv",
       "-o", ItemInterpolation("%(item_dir)s/wget.log"),
